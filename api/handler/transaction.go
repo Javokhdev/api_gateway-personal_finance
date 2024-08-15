@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	pb "api-gateway/genproto"
+
+	"github.com/gin-gonic/gin"
 )
 
 // CreateTransaction handles creating a new transaction
@@ -21,7 +22,7 @@ import (
 func (h *Handler) CreateTransaction(ctx *gin.Context) {
 	req := &pb.CreateTransactionRequest{}
 	if err := ctx.BindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "message": err.Error()})
 		return
 	}
 
@@ -34,18 +35,35 @@ func (h *Handler) CreateTransaction(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-// GetTransactions handles retrieving a list of transactions
+// GetTransactions retrieves all transactions based on the filter criteria
 // @Summary      Get Transactions
-// @Description  Retrieve a list of all transactions
+// @Description  Get transactions based on filter criteria
 // @Tags         Transaction
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Success      200 {object} pb.TransactionsResponse "List of transactions"
+// @Param        account_id query string false "Account ID to filter by"
+// @Param        category_id query string false "Category ID to filter by"
+// @Param        type query string false "Transaction type to filter by"
+// @Param        description query string false "Description to filter by"
+// @Param        date query string false "Date to filter by (YYYY-MM-DD)"
+// @Success      200 {object} pb.TransactionsResponse "Transactions retrieved successfully"
 // @Failure      500 {string} string "Error while retrieving transactions"
 // @Router       /transaction/list [get]
 func (h *Handler) GetTransactions(ctx *gin.Context) {
-	req := &pb.GetTransactionsRequest{}
+	accountId := ctx.Query("account_id")
+	categoryId := ctx.Query("category_id")
+	transactionType := ctx.Query("type")
+	description := ctx.Query("description")
+	date := ctx.Query("date")
+
+	req := &pb.GetTransactionsRequest{
+		AccountId:   accountId,
+		CategoryId:  categoryId,
+		Type:        transactionType,
+		Description: description,
+		Date:        date,
+	}
 
 	res, err := h.Transaction.GetTransactions(ctx, req)
 	if err != nil {
@@ -69,7 +87,7 @@ func (h *Handler) GetTransactions(ctx *gin.Context) {
 // @Failure      500 {string} string "Error while fetching transaction"
 // @Router       /transaction/get/{transaction_id} [get]
 func (h *Handler) GetTransactionById(ctx *gin.Context) {
-	transactionId := ctx.Param("transaction_id")
+	transactionId := ctx.Query("transaction_id")
 	if transactionId == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing required query parameter: transaction_id"})
 		return

@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	pb "api-gateway/genproto"
+
+	"github.com/gin-gonic/gin"
 )
 
 // CreateGoal handles creating a new goal
@@ -69,7 +71,8 @@ func (h *Handler) ListGoals(ctx *gin.Context) {
 // @Failure      500 {string} string "Error while fetching goal"
 // @Router       /goal/get/{goal_id} [get]
 func (h *Handler) GetGoalById(ctx *gin.Context) {
-	goalId := ctx.Param("goal_id")
+	goalId := ctx.Query("goal_id")
+	fmt.Print(goalId)
 	if goalId == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing required query parameter: goal_id"})
 		return

@@ -927,6 +927,89 @@ const docTemplate = `{
                 }
             }
         },
+        "/notification/get/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a notification by user_id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "Get Notification",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/genproto.GetNotificationByidResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Notification not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error while retrieving notification",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/notification/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve a list of all notifications",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notification"
+                ],
+                "summary": "List Notifications",
+                "responses": {
+                    "200": {
+                        "description": "List of notifications retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/genproto.ListNotificationResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Error while retrieving notifications\" // Use Responsee for general errors",
+                        "schema": {
+                            "$ref": "#/definitions/genproto.Responsee"
+                        }
+                    }
+                }
+            }
+        },
         "/transaction/create": {
             "post": {
                 "security": [
@@ -1077,7 +1160,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Retrieve a list of all transactions",
+                "description": "Get transactions based on filter criteria",
                 "consumes": [
                     "application/json"
                 ],
@@ -1088,9 +1171,41 @@ const docTemplate = `{
                     "Transaction"
                 ],
                 "summary": "Get Transactions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Account ID to filter by",
+                        "name": "account_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Category ID to filter by",
+                        "name": "category_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction type to filter by",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description to filter by",
+                        "name": "description",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date to filter by (YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "List of transactions",
+                        "description": "Transactions retrieved successfully",
                         "schema": {
                             "$ref": "#/definitions/genproto.TransactionsResponse"
                         }
@@ -1325,6 +1440,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -1340,10 +1458,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "amount": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "category_id": {
                     "type": "string"
@@ -1373,6 +1491,17 @@ const docTemplate = `{
                 }
             }
         },
+        "genproto.GetNotificationByidResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "genproto.GoalDeleteResponse": {
             "type": "object",
             "properties": {
@@ -1393,11 +1522,14 @@ const docTemplate = `{
                 "goal_id": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
                 "target_amount": {
                     "type": "number"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
@@ -1430,6 +1562,17 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/genproto.GoalResponse"
+                    }
+                }
+            }
+        },
+        "genproto.ListNotificationResponse": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/genproto.GetNotificationByidResponse"
                     }
                 }
             }
@@ -1489,10 +1632,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "amount": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "category_id": {
                     "type": "string"
@@ -1594,7 +1737,7 @@ const docTemplate = `{
         "genproto.UpdateGoalRequest": {
             "type": "object",
             "properties": {
-                "courent_amount": {
+                "current_amount": {
                     "type": "number"
                 },
                 "deadline": {
@@ -1603,11 +1746,14 @@ const docTemplate = `{
                 "goal_id": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
                 "target_amount": {
                     "type": "number"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
@@ -1615,10 +1761,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "account_id": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "amount": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "category_id": {
                     "type": "string"

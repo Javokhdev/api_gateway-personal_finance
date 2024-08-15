@@ -70,7 +70,7 @@ func (h *Handler) ListBudgets(ctx *gin.Context) {
 // @Failure      500 {string} string "Error while fetching budget"
 // @Router       /budget/get/{budget_id} [get]
 func (h *Handler) GetBudgetById(ctx *gin.Context) {
-	budgetId := ctx.Param("budget_id")
+	budgetId := ctx.Query("budget_id")
 	if budgetId == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing required query parameter: budget_id"})
 		return

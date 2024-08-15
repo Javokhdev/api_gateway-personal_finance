@@ -29,3 +29,6 @@ p, unauthorized, /transaction/list, GET
 p, unauthorized, /transaction/get/:id, GET
 p, unauthorized, /transaction/update, PUT
 p, unauthorized, /transaction/delete/:id, DELETE
+
+p, unauthorized, /notification/list, GET
+p, unauthorized, /notification/get/:user_id, GET

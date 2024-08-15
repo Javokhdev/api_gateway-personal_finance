@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	pb "api-gateway/genproto"
+
+	"github.com/gin-gonic/gin"
 )
 
 // CreateAccount handles the creation of a new account
@@ -70,7 +71,7 @@ func (h *Handler) ListAccounts(ctx *gin.Context) {
 // @Failure      500 {string} string "Error while fetching account"
 // @Router       /account/get/{account_id} [get]
 func (h *Handler) GetAccountById(ctx *gin.Context) {
-	accountID := ctx.Param("account_id")
+	accountID := ctx.Query("account_id")
 	if accountID == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing required query parameter: account_id"})
 		return

@@ -70,7 +70,7 @@ func (h *Handler) ListCategories(ctx *gin.Context) {
 // @Failure      500 {string} string "Error while fetching category"
 // @Router       /category/get/{category_id} [get]
 func (h *Handler) GetCategoryById(ctx *gin.Context) {
-	categoryId := ctx.Param("category_id")
+	categoryId := ctx.Query("category_id")
 	if categoryId == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Missing required query parameter: category_id"})
 		return

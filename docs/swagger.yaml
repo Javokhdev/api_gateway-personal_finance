@@ -109,6 +109,8 @@ definitions:
         type: string
       id:
         type: string
+      name:
+        type: string
       status:
         type: string
       target_amount:
@@ -119,9 +121,9 @@ definitions:
   genproto.CreateTransactionRequest:
     properties:
       account_id:
-        type: number
-      amount:
         type: string
+      amount:
+        type: number
       category_id:
         type: string
       date:
@@ -140,6 +142,13 @@ definitions:
       success:
         type: boolean
     type: object
+  genproto.GetNotificationByidResponse:
+    properties:
+      message:
+        type: string
+      user_id:
+        type: string
+    type: object
   genproto.GoalDeleteResponse:
     properties:
       success:
@@ -153,10 +162,12 @@ definitions:
         type: string
       goal_id:
         type: string
+      name:
+        type: string
+      status:
+        type: string
       target_amount:
         type: number
-      user_id:
-        type: string
     type: object
   genproto.ListAccountsResponse:
     properties:
@@ -177,6 +188,13 @@ definitions:
       goals:
         items:
           $ref: '#/definitions/genproto.GoalResponse'
+        type: array
+    type: object
+  genproto.ListNotificationResponse:
+    properties:
+      notifications:
+        items:
+          $ref: '#/definitions/genproto.GetNotificationByidResponse'
         type: array
     type: object
   genproto.ListResponse:
@@ -214,9 +232,9 @@ definitions:
   genproto.TransactionResponse:
     properties:
       account_id:
-        type: number
-      amount:
         type: string
+      amount:
+        type: number
       category_id:
         type: string
       date:
@@ -282,23 +300,25 @@ definitions:
     type: object
   genproto.UpdateGoalRequest:
     properties:
-      courent_amount:
+      current_amount:
         type: number
       deadline:
         type: string
       goal_id:
         type: string
+      name:
+        type: string
+      status:
+        type: string
       target_amount:
         type: number
-      user_id:
-        type: string
     type: object
   genproto.UpdateTransactionRequest:
     properties:
       account_id:
-        type: number
-      amount:
         type: string
+      amount:
+        type: number
       category_id:
         type: string
       date:
@@ -891,6 +911,59 @@ paths:
       summary: Update Goal
       tags:
       - Goal
+  /notification/get/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a notification by user_id
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification retrieved successfully
+          schema:
+            $ref: '#/definitions/genproto.GetNotificationByidResponse'
+        "404":
+          description: Notification not found
+          schema:
+            type: string
+        "500":
+          description: Error while retrieving notification
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Notification
+      tags:
+      - Notification
+  /notification/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all notifications
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of notifications retrieved successfully
+          schema:
+            $ref: '#/definitions/genproto.ListNotificationResponse'
+        "500":
+          description: Error while retrieving notifications" // Use Responsee for
+            general errors
+          schema:
+            $ref: '#/definitions/genproto.Responsee'
+      security:
+      - BearerAuth: []
+      summary: List Notifications
+      tags:
+      - Notification
   /transaction/create:
     post:
       consumes:
@@ -985,12 +1058,33 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve a list of all transactions
+      description: Get transactions based on filter criteria
+      parameters:
+      - description: Account ID to filter by
+        in: query
+        name: account_id
+        type: string
+      - description: Category ID to filter by
+        in: query
+        name: category_id
+        type: string
+      - description: Transaction type to filter by
+        in: query
+        name: type
+        type: string
+      - description: Description to filter by
+        in: query
+        name: description
+        type: string
+      - description: Date to filter by (YYYY-MM-DD)
+        in: query
+        name: date
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: List of transactions
+          description: Transactions retrieved successfully
           schema:
             $ref: '#/definitions/genproto.TransactionsResponse'
         "500":
